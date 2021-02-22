@@ -3,6 +3,7 @@ package com.funnyland.funnyland_server.config;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -27,6 +28,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableRedisHttpSession(maxInactiveIntervalInSeconds = 60*60)
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
+    @Value("${spring.redis.host}")
+    private String redisAddress;
+
+    @Value("${spring.redis.port}")
+    private int redisPort;
+    
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -50,7 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory();
+        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(redisAddress,redisPort);
         return lettuceConnectionFactory;
     }
 
