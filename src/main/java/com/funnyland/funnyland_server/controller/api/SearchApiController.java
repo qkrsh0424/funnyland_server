@@ -65,7 +65,7 @@ public class SearchApiController {
         }else if(!user.getRole().equals("ROLE_ADMIN")){
             resDto.setMessage("not_auth");
         }else{
-            int displaySize = 10;
+            int displaySize = 30;
             int itemSize = searchService.searchCounselingAllCountService();
             List<CounselingGetDto> data = searchService.searchCounselingAllService(pageIndex,displaySize);
 
@@ -106,21 +106,40 @@ public class SearchApiController {
 
     // /api/search/product/all
     @GetMapping("/product/all")
-    public ResponseEntity<Message> SearchProductAllApi(HttpServletRequest request){
+    public ResponseEntity<Message> SearchProductAllApi(HttpServletRequest request, @RequestParam(value = "categoryId", required = false) String categoryIdStr, @RequestParam(value = "pageIndex", required = false) String pageIndexStr){
         HttpHeaders headers = new HttpHeaders();
         Message message = new Message();
-
         List<ProductJCategoryGetDto> resData = new ArrayList<>();
+        int displaySize = 30;
+        int itemSize = 0;
+        int pageIndex = 0;
+
         try{
-            resData = searchService.searchProductAllService();
+            pageIndex = Integer.parseInt(pageIndexStr);
+        }catch(NumberFormatException e){
+            System.out.println(e);
+        }
+
+        try{
+            itemSize = searchService.searchCountForProductExistService(categoryIdStr);
+            resData = searchService.searchProductAllService(categoryIdStr, pageIndex, displaySize);
         }catch(Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        // System.out.println(itemSize);
+        PageDto page = new PageDto();
+        page.setItemSize(itemSize);
+        page.setDisplaySize(displaySize);
+        page.setPageSize((int) Math.ceil((double) itemSize / (double) displaySize));
+        page.setCurr(pageIndex+1);
+        page.setPrev(pageIndex==0 ? 1 : pageIndex);
+        page.setNext(pageIndex+1 >= page.getPageSize()?page.getPageSize():page.getCurr()+1);
 
         headers.setContentType(new MediaType("application","json",Charset.forName("UTF-8")));
         message.setStatus(StatusEnum.OK);
         message.setMessage("success");
         message.setData(resData);
+        message.setPage(page);
         return new ResponseEntity<>(message,headers,HttpStatus.OK);
     }
 }

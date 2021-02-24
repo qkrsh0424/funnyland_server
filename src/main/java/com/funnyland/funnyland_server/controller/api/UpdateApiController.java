@@ -10,6 +10,7 @@ import com.funnyland.funnyland_server.model.counseling.dto.CounselingGetDto;
 import com.funnyland.funnyland_server.model.message.Message;
 import com.funnyland.funnyland_server.model.message.StatusEnum;
 import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
+import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
 import com.funnyland.funnyland_server.model.user.vo.UserInfoVO;
 import com.funnyland.funnyland_server.service.UpdateService;
 import com.funnyland.funnyland_server.service.user.UserService;
@@ -49,7 +50,7 @@ public class UpdateApiController {
 
     // /api/update/product/one
     @PostMapping("/product/one")
-    public ResponseEntity<Message> InsertProductOneRequest(HttpServletRequest request, @RequestBody ProductGetDto dto){
+    public ResponseEntity<Message> UpdateProductOneRequest(HttpServletRequest request, @RequestBody ProductGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
 
@@ -63,6 +64,32 @@ public class UpdateApiController {
         }
         try{
             updateService.updateProductOneService(dto);
+        }catch(Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/update/category/one
+    @PostMapping("/category/one")
+    public ResponseEntity<Message> UpdateCategoryOneRequestApi(HttpServletRequest request, @RequestBody ProductCategoryGetDto dto){
+        Message message = new Message();
+        HttpHeaders headers= new HttpHeaders();
+
+        try{
+            UserInfoVO user = userService.getUserInfo(request);
+            if(!user.getRole().equals("ROLE_ADMIN")){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }catch(NullPointerException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        try{
+            updateService.updateCategoryOneService(dto);
         }catch(Exception e){
             System.out.println(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

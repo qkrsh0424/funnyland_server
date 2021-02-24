@@ -117,12 +117,43 @@ public class SearchService {
         return dtos;
     }
 
-	public List<ProductJCategoryGetDto> searchProductAllService() {
-        List<ProductJProductCategoryProj> projs = productPureRepository.selectAllConProductCategory();
+	public List<ProductJCategoryGetDto> searchProductAllService(String categoryIdStr, int pageIndex, int displaySize) {
+        List<ProductJProductCategoryProj> projs = new ArrayList<>();
+        Pageable pageable = PageRequest.of(pageIndex, displaySize);
+
+        if(categoryIdStr == null){
+            projs = productPureRepository.selectAllConProductCategory(pageable);
+        }else{
+            int categoryId = -1;
+            try{
+                categoryId = Integer.parseInt(categoryIdStr);
+            }catch(NumberFormatException e){
+                // System.out.println(e);
+            }
+            if(categoryId==-1){
+                projs = productPureRepository.selectAllConProductCategory(pageable);
+            }else{
+                projs = productPureRepository.selectSomeConProductCategoryByCategoryIdAndPageIndex(categoryId,pageable);
+            }
+            
+        }
         List<ProductJCategoryGetDto> dtos = getProductJCategoryDtosByProjs(projs);
 
 		return dtos;
 	}
+
+    public int searchCountForProductExistService(String categoryIdStr){
+        int categoryId = -1;
+        try{
+            categoryId = Integer.parseInt(categoryIdStr);
+        }catch(NumberFormatException e){
+
+        }
+        if(categoryId==-1){
+            return productPureRepository.countExistAll();
+        }
+        return productPureRepository.countExistAllByCategoryId(categoryId);
+    }
 
     private List<ProductJCategoryGetDto> getProductJCategoryDtosByProjs(List<ProductJProductCategoryProj> projs){
         List<ProductJCategoryGetDto> pjcDtos = new ArrayList<>();

@@ -10,6 +10,8 @@ import com.funnyland.funnyland_server.model.counseling.entity.CounselingPureEnti
 import com.funnyland.funnyland_server.model.counseling.repository.CounselingPureRepository;
 import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product.repository.ProductPureRepository;
+import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
+import com.funnyland.funnyland_server.model.product_category.repository.ProductCategoryPureRepository;
 import com.funnyland.funnyland_server.service.handler.DateService;
 import com.funnyland.funnyland_server.service.handler.RSAHandlerService;
 
@@ -29,6 +31,9 @@ public class UpdateService {
 
     @Autowired
     CounselingPureRepository counselingPureRepository;
+
+    @Autowired
+    ProductCategoryPureRepository productCategoryPureRepository;
 
     @Autowired
     ProductPureRepository productPureRepository;
@@ -72,6 +77,14 @@ public class UpdateService {
             r.setProductHide(dto.getHide());
             r.setProductUpdated(dateService.getCurrentDate());
             productPureRepository.save(r);
+        });
+	}
+
+	public void updateCategoryOneService(ProductCategoryGetDto dto) {
+        productCategoryPureRepository.findById(dto.getId()).ifPresent(r->{
+            r.setProductCategoryName(dto.getCategoryName());
+            r.setProductCategoryPriority(dto.getPriority());
+            productCategoryPureRepository.save(r);
         });
 	}
 }
