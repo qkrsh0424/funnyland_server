@@ -142,4 +142,36 @@ public class SearchApiController {
         message.setPage(page);
         return new ResponseEntity<>(message,headers,HttpStatus.OK);
     }
+
+    // /api/search/product/one
+    @GetMapping("/product/one")
+    public ResponseEntity<Message> SearchProductOneApi(HttpServletRequest request, @RequestParam(value = "productId", required = false) String productIdStr){
+        HttpHeaders headers = new HttpHeaders();
+        Message message = new Message();
+        ProductJCategoryGetDto resData = new ProductJCategoryGetDto();
+        
+        int productId = 0;
+
+        try{
+            productId = Integer.parseInt(productIdStr);
+        }catch(NumberFormatException e){
+            headers.setContentType(new MediaType("application","json",Charset.forName("UTF-8")));
+            message.setStatus(StatusEnum.OK);
+            message.setMessage("no_data");
+            return new ResponseEntity<>(message,headers,HttpStatus.OK);
+        }
+
+        try{
+            resData = searchService.searchProductOneService(productId);
+        }catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        // System.out.println(itemSize);
+
+        headers.setContentType(new MediaType("application","json",Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        message.setData(resData);
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
 }
