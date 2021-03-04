@@ -25,6 +25,15 @@ import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product_category.entity.ProductCategoryPureEntity;
 import com.funnyland.funnyland_server.model.product.entity.ProductPureEntity;
 import com.funnyland.funnyland_server.model.product_category.repository.ProductCategoryPureRepository;
+import com.funnyland.funnyland_server.model.store.dto.StoreGetDto;
+import com.funnyland.funnyland_server.model.store.entity.StorePureEntity;
+import com.funnyland.funnyland_server.model.store.repository.StorePureRepository;
+import com.funnyland.funnyland_server.model.store_area.dto.StoreAreaGetDto;
+import com.funnyland.funnyland_server.model.store_area.entity.StoreAreaPureEntity;
+import com.funnyland.funnyland_server.model.store_area.repository.StoreAreaPureRepository;
+import com.funnyland.funnyland_server.model.video.dto.VideoGetDto;
+import com.funnyland.funnyland_server.model.video.entity.VideoPureEntity;
+import com.funnyland.funnyland_server.model.video.repository.VideoPureRepository;
 import com.funnyland.funnyland_server.model.product.repository.ProductPureRepository;
 import com.funnyland.funnyland_server.service.handler.DateService;
 import com.funnyland.funnyland_server.service.handler.RSAHandlerService;
@@ -52,6 +61,15 @@ public class InsertService {
 
     @Autowired
     ProductPureRepository productPureRepository;
+
+    @Autowired
+    VideoPureRepository videoPureRepository;
+
+    @Autowired
+    StoreAreaPureRepository storeAreaPureRepository;
+
+    @Autowired
+    StorePureRepository storePureRepository;
 
     public void insertCounselingOneService(CounselingReqDto dto) {
         counselingPureRepository.save(getCounselingEntityByDto(dto));
@@ -130,9 +148,59 @@ public class InsertService {
         entity.setProductSummary(dto.getSummary());
         entity.setProductDesc(dto.getDesc());
         entity.setProductImageUrl(dto.getImageUrl());
+        entity.setProductNewChecked(dto.isNewChecked()?1:0);
+        entity.setProductHitChecked(dto.isHitChecked()?1:0);
+        entity.setProductEventChecked(dto.isEventChecked()?1:0);
         entity.setProductHide(dto.getHide());
         entity.setProductCreated(dateService.getCurrentDate());
         entity.setProductUpdated(dateService.getCurrentDate());
+        return entity;
+    }
+
+	public void insertVideoOneService(VideoGetDto dto) {
+        VideoPureEntity entity = getVideoPureEntityByDto(dto);
+        videoPureRepository.save(entity);
+	}
+
+    private VideoPureEntity getVideoPureEntityByDto(VideoGetDto dto){
+        VideoPureEntity entity = new VideoPureEntity();
+        entity.setVideoName(dto.getVideoName());
+        entity.setVideoType(dto.getVideoType());
+        entity.setVideoUrl(dto.getVideoUrl());
+        entity.setVideoKey(dto.getVideoKey());
+        entity.setVideoCreated(dateService.getCurrentDate());
+        entity.setVideoUpdated(dateService.getCurrentDate());
+        return entity;
+    }
+
+	public void insertStoreAreaOneService(StoreAreaGetDto dto) {
+        storeAreaPureRepository.save(getStoreAreaEntityByDto(dto));
+	}
+
+    private StoreAreaPureEntity getStoreAreaEntityByDto(StoreAreaGetDto dto){
+        StoreAreaPureEntity entity = new StoreAreaPureEntity();
+        entity.setStoreAreaName(dto.getAreaName());
+        entity.setStoreAreaCreated(dateService.getCurrentDate());
+        entity.setStoreAreaUpdated(dateService.getCurrentDate());
+        return entity;
+    }
+
+	public void insertStoreOneService(StoreGetDto dto) {
+        storePureRepository.save(getStoreEntityByDto(dto));
+	}
+
+    private StorePureEntity getStoreEntityByDto(StoreGetDto dto){
+        StorePureEntity entity = new StorePureEntity();
+        entity.setStoreArea(dto.getStoreArea());
+        entity.setStoreName(dto.getStoreName());
+        entity.setStoreAddress(dto.getStoreAddress());
+        entity.setStorePhone(dto.getStorePhone());
+        entity.setStoreDesc(dto.getStoreDesc());
+        entity.setStoreImageUrl(dto.getStoreImageUrl());
+        entity.setStoreLat(dto.getStoreLat());
+        entity.setStoreLng(dto.getStoreLng());
+        entity.setStoreCreated(dateService.getCurrentDate());
+        entity.setStoreUpdated(dateService.getCurrentDate());
         return entity;
     }
 }

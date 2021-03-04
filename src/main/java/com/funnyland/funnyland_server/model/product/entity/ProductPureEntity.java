@@ -41,6 +41,15 @@ public class ProductPureEntity {
     @Column(name="product_image_url")
     private String productImageUrl;
 
+    @Column(name="product_new_checked")
+    private int productNewChecked;
+
+    @Column(name="product_hit_checked")
+    private int productHitChecked;
+
+    @Column(name="product_event_checked")
+    private int productEventChecked;
+    
     @Column(name="product_hide")
     private int productHide;
 

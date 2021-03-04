@@ -11,7 +11,10 @@ import com.funnyland.funnyland_server.model.message.Message;
 import com.funnyland.funnyland_server.model.message.StatusEnum;
 import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
+import com.funnyland.funnyland_server.model.store.dto.StoreGetDto;
+import com.funnyland.funnyland_server.model.store_area.dto.StoreAreaGetDto;
 import com.funnyland.funnyland_server.model.user.vo.UserInfoVO;
+import com.funnyland.funnyland_server.model.video.dto.VideoGetDto;
 import com.funnyland.funnyland_server.service.UpdateService;
 import com.funnyland.funnyland_server.service.user.UserService;
 
@@ -90,6 +93,84 @@ public class UpdateApiController {
         }
         try{
             updateService.updateCategoryOneService(dto);
+        }catch(Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/update/video/one/display
+    @PostMapping("/video/one/display")
+    public ResponseEntity<Message> UpdateVideoOneDisplayRequestApi(HttpServletRequest request, @RequestBody VideoGetDto dto){
+        Message message = new Message();
+        HttpHeaders headers= new HttpHeaders();
+
+        try{
+            UserInfoVO user = userService.getUserInfo(request);
+            if(!user.getRole().equals("ROLE_ADMIN")){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }catch(NullPointerException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        try{
+            updateService.updateVideoOneDisplayService(dto);
+        }catch(Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/update/store_area/one
+    @PostMapping("/store_area/one")
+    public ResponseEntity<Message> UpdateStoreAreaOneRequestApi(HttpServletRequest request, @RequestBody StoreAreaGetDto dto){
+        Message message = new Message();
+        HttpHeaders headers= new HttpHeaders();
+
+        try{
+            UserInfoVO user = userService.getUserInfo(request);
+            if(!user.getRole().equals("ROLE_ADMIN")){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }catch(NullPointerException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        try{
+            updateService.updateStoreAreaOneService(dto);
+        }catch(Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/update/store/one
+    @PostMapping("/store/one")
+    public ResponseEntity<Message> UpdateStoreOneRequestApi(HttpServletRequest request, @RequestBody StoreGetDto dto){
+        Message message = new Message();
+        HttpHeaders headers= new HttpHeaders();
+
+        try{
+            UserInfoVO user = userService.getUserInfo(request);
+            if(!user.getRole().equals("ROLE_ADMIN")){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }catch(NullPointerException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        try{
+            updateService.updateStoreOneService(dto);
         }catch(Exception e){
             System.out.println(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

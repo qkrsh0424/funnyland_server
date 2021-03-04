@@ -15,7 +15,10 @@ import com.funnyland.funnyland_server.model.message.StatusEnum;
 import com.funnyland.funnyland_server.model.page.PageDto;
 import com.funnyland.funnyland_server.model.product.dto.ProductJCategoryGetDto;
 import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
+import com.funnyland.funnyland_server.model.store.dto.StoreGetDto;
+import com.funnyland.funnyland_server.model.store_area.dto.StoreAreaGetDto;
 import com.funnyland.funnyland_server.model.user.vo.UserInfoVO;
+import com.funnyland.funnyland_server.model.video.dto.VideoGetDto;
 import com.funnyland.funnyland_server.service.SearchService;
 import com.funnyland.funnyland_server.service.user.UserAuthService;
 import com.funnyland.funnyland_server.service.user.UserService;
@@ -106,23 +109,30 @@ public class SearchApiController {
 
     // /api/search/product/all
     @GetMapping("/product/all")
-    public ResponseEntity<Message> SearchProductAllApi(HttpServletRequest request, @RequestParam(value = "categoryId", required = false) String categoryIdStr, @RequestParam(value = "pageIndex", required = false) String pageIndexStr){
+    public ResponseEntity<Message> SearchProductAllApi(
+        HttpServletRequest request, 
+        @RequestParam(value = "categoryId", required = false) String categoryIdStr, 
+        @RequestParam(value = "pageIndex", required = false) String pageIndexStr,
+        @RequestParam(value = "newChecked", required = false) boolean newChecked,
+        @RequestParam(value = "hitChecked", required = false) boolean hitChecked,
+        @RequestParam(value = "eventChecked", required = false) boolean eventChecked
+    ){
         HttpHeaders headers = new HttpHeaders();
         Message message = new Message();
         List<ProductJCategoryGetDto> resData = new ArrayList<>();
-        int displaySize = 30;
+        int displaySize = 20;
         int itemSize = 0;
         int pageIndex = 0;
 
         try{
             pageIndex = Integer.parseInt(pageIndexStr);
         }catch(NumberFormatException e){
-            System.out.println(e);
+            // System.out.println(e);
         }
 
         try{
-            itemSize = searchService.searchCountForProductExistService(categoryIdStr);
-            resData = searchService.searchProductAllService(categoryIdStr, pageIndex, displaySize);
+            itemSize = searchService.searchCountForProductExistService(categoryIdStr, newChecked, hitChecked, eventChecked);
+            resData = searchService.searchProductAllService(categoryIdStr, pageIndex, displaySize, newChecked, hitChecked, eventChecked);
         }catch(Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -163,6 +173,121 @@ public class SearchApiController {
 
         try{
             resData = searchService.searchProductOneService(productId);
+        }catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        // System.out.println(itemSize);
+
+        headers.setContentType(new MediaType("application","json",Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        message.setData(resData);
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/search/video/all
+    @GetMapping("/video/all")
+    public ResponseEntity<Message> SearchVideoAllApi(HttpServletRequest request){
+        HttpHeaders headers = new HttpHeaders();
+        Message message = new Message();
+
+        List<VideoGetDto> resData = new ArrayList<>();
+        try{
+            resData = searchService.searchVideoAllService();
+        }catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        headers.setContentType(new MediaType("application","json",Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        message.setData(resData);
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/search/store_area/all
+    @GetMapping("/store_area/all")
+    public ResponseEntity<Message> SearchStoreAreaAllApi(HttpServletRequest request){
+        HttpHeaders headers = new HttpHeaders();
+        Message message = new Message();
+
+        List<StoreAreaGetDto> resData = new ArrayList<>();
+        try{
+            resData = searchService.searchStoreAreaAllService();
+        }catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        headers.setContentType(new MediaType("application","json",Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        message.setData(resData);
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/search/store/all
+    @GetMapping("/store/all")
+    public ResponseEntity<Message> SearchStoreAllApi(
+        HttpServletRequest request, 
+        @RequestParam(value = "areaName", required = false) String areaName,
+        @RequestParam(value = "pageIndex", required = false) String pageIndexStr
+    ){
+        HttpHeaders headers = new HttpHeaders();
+        Message message = new Message();
+
+        List<StoreGetDto> resData = new ArrayList<>();
+        int displaySize = 30;
+        int itemSize = 0;
+        int pageIndex = 0;
+
+        try{
+            pageIndex = Integer.parseInt(pageIndexStr);
+        }catch(NumberFormatException e){
+            // System.out.println(e);
+        }
+        try{
+            itemSize = searchService.searchCountForStoreExistService(areaName);
+            resData = searchService.searchStoreAllService(areaName, pageIndex, displaySize);
+        }catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        PageDto page = new PageDto();
+        page.setItemSize(itemSize);
+        page.setDisplaySize(displaySize);
+        page.setPageSize((int) Math.ceil((double) itemSize / (double) displaySize));
+        page.setCurr(pageIndex+1);
+        page.setPrev(pageIndex==0 ? 1 : pageIndex);
+        page.setNext(pageIndex+1 >= page.getPageSize()?page.getPageSize():page.getCurr()+1);
+
+
+        headers.setContentType(new MediaType("application","json",Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        message.setData(resData);
+        message.setPage(page);
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/search/store/one
+    @GetMapping("/store/one")
+    public ResponseEntity<Message> SearchStoreOneApi(HttpServletRequest request, @RequestParam(value = "storeId", required = false) String storeIdStr){
+        HttpHeaders headers = new HttpHeaders();
+        Message message = new Message();
+        StoreGetDto resData = new StoreGetDto();
+        
+        int storeId = 0;
+
+        try{
+            storeId = Integer.parseInt(storeIdStr);
+        }catch(NumberFormatException e){
+            headers.setContentType(new MediaType("application","json",Charset.forName("UTF-8")));
+            message.setStatus(StatusEnum.OK);
+            message.setMessage("no_data");
+            return new ResponseEntity<>(message,headers,HttpStatus.OK);
+        }
+
+        try{
+            resData = searchService.searchStoreOneService(storeId);
         }catch(Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

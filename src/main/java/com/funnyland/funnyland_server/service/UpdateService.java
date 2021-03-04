@@ -12,6 +12,12 @@ import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product.repository.ProductPureRepository;
 import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
 import com.funnyland.funnyland_server.model.product_category.repository.ProductCategoryPureRepository;
+import com.funnyland.funnyland_server.model.store.dto.StoreGetDto;
+import com.funnyland.funnyland_server.model.store.repository.StorePureRepository;
+import com.funnyland.funnyland_server.model.store_area.dto.StoreAreaGetDto;
+import com.funnyland.funnyland_server.model.store_area.repository.StoreAreaPureRepository;
+import com.funnyland.funnyland_server.model.video.dto.VideoGetDto;
+import com.funnyland.funnyland_server.model.video.repository.VideoPureRepository;
 import com.funnyland.funnyland_server.service.handler.DateService;
 import com.funnyland.funnyland_server.service.handler.RSAHandlerService;
 
@@ -37,6 +43,15 @@ public class UpdateService {
 
     @Autowired
     ProductPureRepository productPureRepository;
+
+    @Autowired
+    VideoPureRepository videoPureRepository;
+
+    @Autowired
+    StoreAreaPureRepository storeAreaPureRepository;
+
+    @Autowired
+    StorePureRepository storePureRepository;
 
     public void updateBannersAllService(List<BannerGetDto> dtos){
         
@@ -74,6 +89,9 @@ public class UpdateService {
             r.setProductSummary(dto.getSummary());
             r.setProductDesc(dto.getDesc());
             r.setProductImageUrl(dto.getImageUrl());
+            r.setProductNewChecked(dto.isNewChecked()? 1 : 0);
+            r.setProductHitChecked(dto.isHitChecked()? 1 : 0);
+            r.setProductEventChecked(dto.isEventChecked() ? 1 : 0);
             r.setProductHide(dto.getHide());
             r.setProductUpdated(dateService.getCurrentDate());
             productPureRepository.save(r);
@@ -85,6 +103,37 @@ public class UpdateService {
             r.setProductCategoryName(dto.getCategoryName());
             r.setProductCategoryPriority(dto.getPriority());
             productCategoryPureRepository.save(r);
+        });
+	}
+
+	public void updateVideoOneDisplayService(VideoGetDto dto) {
+        videoPureRepository.updateDisplaySetClear();
+        videoPureRepository.findById(dto.getVideoId()).ifPresent(r->{
+            r.setVideoDisplay(dto.getVideoDisplay());
+            videoPureRepository.save(r);
+        });
+	}
+
+	public void updateStoreAreaOneService(StoreAreaGetDto dto) {
+        storeAreaPureRepository.findById(dto.getAreaId()).ifPresent(r->{
+            r.setStoreAreaName(dto.getAreaName());
+            r.setStoreAreaUpdated(dateService.getCurrentDate());
+            storeAreaPureRepository.save(r);
+        });
+	}
+
+	public void updateStoreOneService(StoreGetDto dto) {
+        storePureRepository.findById(dto.getStoreId()).ifPresent(r->{
+            r.setStoreName(dto.getStoreName());
+            r.setStoreArea(dto.getStoreArea());
+            r.setStoreAddress(dto.getStoreAddress());
+            r.setStorePhone(dto.getStorePhone());
+            r.setStoreDesc(dto.getStoreDesc());
+            r.setStoreImageUrl(dto.getStoreImageUrl());
+            r.setStoreLat(dto.getStoreLat());
+            r.setStoreLng(dto.getStoreLng());
+            r.setStoreUpdated(dateService.getCurrentDate());
+            storePureRepository.save(r);
         });
 	}
 }

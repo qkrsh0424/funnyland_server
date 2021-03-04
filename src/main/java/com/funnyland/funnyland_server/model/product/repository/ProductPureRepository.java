@@ -13,20 +13,25 @@ import org.springframework.data.jpa.repository.Query;
 public interface ProductPureRepository extends JpaRepository<ProductPureEntity, Integer> {
         @Query("SELECT p AS product, pc AS category FROM ProductPureEntity p\n"
                         + "LEFT OUTER JOIN ProductCategoryPureEntity pc ON p.productCategoryId = pc.productCategoryId\n"
-                        + "WHERE p.productDeleted=0")
-        public List<ProductJProductCategoryProj> selectAllConProductCategory(Pageable pageable);
+                        + "WHERE p.productDeleted=0 AND pc.productCategoryDeleted=0 AND p.productNewChecked IN :newChecked AND p.productHitChecked IN :hitChecked AND p.productEventChecked IN :eventChecked\n"
+                        + "ORDER BY p.productUpdated DESC")
+        public List<ProductJProductCategoryProj> selectAllConProductCategory(Pageable pageable, int[] newChecked, int[] hitChecked, int[] eventChecked);
 
         @Query("SELECT p AS product, pc AS category FROM ProductPureEntity p\n"
                         + "LEFT OUTER JOIN ProductCategoryPureEntity pc ON p.productCategoryId = pc.productCategoryId\n"
-                        + "WHERE p.productDeleted=0 AND p.productCategoryId=:categoryId")
-        public List<ProductJProductCategoryProj> selectSomeConProductCategoryByCategoryIdAndPageIndex(int categoryId,
-                        Pageable pageable);
+                        + "WHERE p.productDeleted=0 AND p.productCategoryId=:categoryId AND pc.productCategoryDeleted=0 AND p.productNewChecked IN :newChecked AND p.productHitChecked IN :hitChecked AND p.productEventChecked IN :eventChecked\n"
+                        + "ORDER BY p.productUpdated DESC")
+        public List<ProductJProductCategoryProj> selectSomeConProductCategoryByCategoryIdAndPageIndex(int categoryId, Pageable pageable, int[] newChecked, int[] hitChecked, int[] eventChecked);
 
-        @Query("SELECT count(p) FROM ProductPureEntity p WHERE p.productDeleted=0")
-        public int countExistAll();
+        @Query("SELECT count(p) FROM ProductPureEntity p\n"
+                        + "LEFT OUTER JOIN ProductCategoryPureEntity pc ON p.productCategoryId = pc.productCategoryId\n"
+                        + "WHERE p.productDeleted=0 AND pc.productCategoryDeleted=0 AND p.productNewChecked IN :newChecked AND p.productHitChecked IN :hitChecked AND p.productEventChecked IN :eventChecked")
+        public int countExistAll(int[] newChecked, int[] hitChecked, int[] eventChecked);
 
-        @Query("SELECT count(p) FROM ProductPureEntity p WHERE p.productDeleted=0 AND p.productCategoryId=:categoryId")
-        public int countExistAllByCategoryId(int categoryId);
+        @Query("SELECT count(p) FROM ProductPureEntity p\n"
+                        + "LEFT OUTER JOIN ProductCategoryPureEntity pc ON p.productCategoryId = pc.productCategoryId\n"
+                        + "WHERE p.productDeleted=0 AND pc.productCategoryDeleted=0 AND p.productCategoryId=:categoryId AND p.productNewChecked IN :newChecked AND p.productHitChecked IN :hitChecked AND p.productEventChecked IN :eventChecked")
+        public int countExistAllByCategoryId(int categoryId, int[] newChecked, int[] hitChecked, int[] eventChecked);
 
         @Query("SELECT p AS product, pc AS category FROM ProductPureEntity p\n"
                         + "LEFT OUTER JOIN ProductCategoryPureEntity pc ON p.productCategoryId = pc.productCategoryId\n"

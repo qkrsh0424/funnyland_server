@@ -14,5 +14,8 @@ public class ProductGetDto {
     private String summary;
     private String desc;
     private String imageUrl;
+    private boolean newChecked;
+    private boolean hitChecked;
+    private boolean eventChecked;
     private int hide;
 }

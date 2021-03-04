@@ -8,6 +8,12 @@ import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product.repository.ProductPureRepository;
 import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
 import com.funnyland.funnyland_server.model.product_category.repository.ProductCategoryPureRepository;
+import com.funnyland.funnyland_server.model.store.dto.StoreGetDto;
+import com.funnyland.funnyland_server.model.store.repository.StorePureRepository;
+import com.funnyland.funnyland_server.model.store_area.dto.StoreAreaGetDto;
+import com.funnyland.funnyland_server.model.store_area.repository.StoreAreaPureRepository;
+import com.funnyland.funnyland_server.model.video.dto.VideoGetDto;
+import com.funnyland.funnyland_server.model.video.repository.VideoPureRepository;
 import com.funnyland.funnyland_server.service.handler.DateService;
 import com.funnyland.funnyland_server.service.handler.EXIST_OR_NOT;
 
@@ -30,6 +36,14 @@ public class DeleteService {
     @Autowired
     ProductPureRepository productPureRepository;
 
+    @Autowired
+    VideoPureRepository videoPureRepository;
+
+    @Autowired
+    StoreAreaPureRepository storeAreaPureRepository;
+
+    @Autowired
+    StorePureRepository storePureRepository;
     public void deleteBannerOneService(BannerGetDto dto){
         bannerPureRepository.findById(dto.getId()).ifPresent(r->{
             r.setBannerDeleted(EXIST_OR_NOT.IS_DELETED);
@@ -55,5 +69,18 @@ public class DeleteService {
             r.setProductDeleted(EXIST_OR_NOT.IS_DELETED);
             productPureRepository.save(r);
         });
+	}
+	public void deleteVideoOneService(VideoGetDto dto) {
+        videoPureRepository.deleteById(dto.getVideoId());
+	}
+	public void deleteStoreAreaOneService(StoreAreaGetDto dto) {
+        storeAreaPureRepository.findById(dto.getAreaId()).ifPresent(r->{
+            r.setStoreAreaDeleted(EXIST_OR_NOT.IS_DELETED);
+            r.setStoreAreaUpdated(dateService.getCurrentDate());
+            storeAreaPureRepository.save(r);
+        });
+	}
+	public void deleteStoreOneService(StoreGetDto dto) {
+        storePureRepository.deleteById(dto.getStoreId());
 	}
 }
