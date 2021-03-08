@@ -20,6 +20,9 @@ import com.funnyland.funnyland_server.model.banner.repository.BannerPureReposito
 import com.funnyland.funnyland_server.model.counseling.dto.CounselingReqDto;
 import com.funnyland.funnyland_server.model.counseling.entity.CounselingPureEntity;
 import com.funnyland.funnyland_server.model.counseling.repository.CounselingPureRepository;
+import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
+import com.funnyland.funnyland_server.model.cs.entity.CsPureEntity;
+import com.funnyland.funnyland_server.model.cs.repository.CsPureRepository;
 import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
 import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product_category.entity.ProductCategoryPureEntity;
@@ -70,6 +73,9 @@ public class InsertService {
 
     @Autowired
     StorePureRepository storePureRepository;
+
+    @Autowired
+    CsPureRepository csPureRepository;
 
     public void insertCounselingOneService(CounselingReqDto dto) {
         counselingPureRepository.save(getCounselingEntityByDto(dto));
@@ -201,6 +207,22 @@ public class InsertService {
         entity.setStoreLng(dto.getStoreLng());
         entity.setStoreCreated(dateService.getCurrentDate());
         entity.setStoreUpdated(dateService.getCurrentDate());
+        return entity;
+    }
+
+	public void insertCsOneService(CsGetDto dto) {
+        csPureRepository.save(getCsEntityByDto(dto));
+	}
+
+    private CsPureEntity getCsEntityByDto(CsGetDto dto){
+        CsPureEntity entity = new CsPureEntity();
+        entity.setCsType(dto.getCsType());
+        entity.setCsTitle(dto.getCsTitle());
+        entity.setCsDesc(dto.getCsDesc());
+        entity.setCsAuthor(dto.getCsAuthor());
+        entity.setCsImportantChecked(dto.isCsImportantChecked());
+        entity.setCsCreated(dateService.getCurrentDate());
+        entity.setCsUpdated(dateService.getCurrentDate());
         return entity;
     }
 }

@@ -10,6 +10,9 @@ import com.funnyland.funnyland_server.model.banner.repository.BannerPureReposito
 import com.funnyland.funnyland_server.model.counseling.dto.CounselingGetDto;
 import com.funnyland.funnyland_server.model.counseling.entity.CounselingPureEntity;
 import com.funnyland.funnyland_server.model.counseling.repository.CounselingPureRepository;
+import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
+import com.funnyland.funnyland_server.model.cs.entity.CsPureEntity;
+import com.funnyland.funnyland_server.model.cs.repository.CsPureRepository;
 import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product.dto.ProductJCategoryGetDto;
 import com.funnyland.funnyland_server.model.product.projection.ProductJProductCategoryProj;
@@ -58,6 +61,9 @@ public class SearchService {
 
     @Autowired
     StorePureRepository storePureRepository;
+
+    @Autowired
+    CsPureRepository csPureRepository;
 
     public List<BannerGetDto> searchBannerAllByorderService() {
         List<BannerPureEntity> entities = bannerPureRepository.selectBannerAllByorder();
@@ -345,6 +351,57 @@ public class SearchService {
         dto.setStoreLng(entity.getStoreLng());
         dto.setStoreCreated(entity.getStoreCreated());
         dto.setStoreUpdated(entity.getStoreUpdated());
+        return dto;
+    }
+
+	public List<CsGetDto> searchCsAllService(String csType, int pageIndex, int displaySize) {
+        Pageable pageable = PageRequest.of(pageIndex, displaySize);
+		return getCsDtosByEntities(csPureRepository.selectAllByExist(csType, pageable));
+	}
+
+    private List<CsGetDto> getCsDtosByEntities(List<CsPureEntity> entities){
+        List<CsGetDto> dtos = new ArrayList<>();
+        for(CsPureEntity entity : entities){
+            CsGetDto dto = new CsGetDto();
+            dto.setCsId(entity.getCsId());
+            dto.setCsType(entity.getCsType());
+            dto.setCsTitle(entity.getCsTitle());
+            dto.setCsDesc(entity.getCsDesc());
+            dto.setCsAuthor(entity.getCsAuthor());
+            dto.setCsImportantChecked(entity.isCsImportantChecked());
+            dto.setCsCreated(entity.getCsCreated());
+            dto.setCsUpdated(entity.getCsUpdated());
+            dto.setCsViewCount(entity.getCsViewCount());
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+
+	public int searchCountForCsExistService(String csType) {
+		return csPureRepository.countExistAllByCsType(csType);
+	}
+
+    public CsGetDto searchCsOneService(int csId) {
+        Optional<CsPureEntity> entityOpt = csPureRepository.selectOneByCsId(csId);
+        if(entityOpt.isPresent()){
+            CsGetDto dto = getCsDtoByEntity(entityOpt.get());
+            return dto;
+        }else{
+            return null;
+        }
+    }
+
+    private CsGetDto getCsDtoByEntity(CsPureEntity entity){
+        CsGetDto dto = new CsGetDto();
+        dto.setCsId(entity.getCsId());
+        dto.setCsType(entity.getCsType());
+        dto.setCsTitle(entity.getCsTitle());
+        dto.setCsAuthor(entity.getCsAuthor());
+        dto.setCsDesc(entity.getCsDesc());
+        dto.setCsImportantChecked(entity.isCsImportantChecked());
+        dto.setCsViewCount(entity.getCsViewCount());
+        dto.setCsCreated(entity.getCsCreated());
+        dto.setCsUpdated(entity.getCsUpdated());
         return dto;
     }
 }

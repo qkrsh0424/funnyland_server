@@ -8,6 +8,8 @@ import com.funnyland.funnyland_server.model.banner.repository.BannerPureReposito
 import com.funnyland.funnyland_server.model.counseling.dto.CounselingGetDto;
 import com.funnyland.funnyland_server.model.counseling.entity.CounselingPureEntity;
 import com.funnyland.funnyland_server.model.counseling.repository.CounselingPureRepository;
+import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
+import com.funnyland.funnyland_server.model.cs.repository.CsPureRepository;
 import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product.repository.ProductPureRepository;
 import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
@@ -52,6 +54,9 @@ public class UpdateService {
 
     @Autowired
     StorePureRepository storePureRepository;
+
+    @Autowired
+    CsPureRepository csPureRepository;
 
     public void updateBannersAllService(List<BannerGetDto> dtos){
         
@@ -134,6 +139,20 @@ public class UpdateService {
             r.setStoreLng(dto.getStoreLng());
             r.setStoreUpdated(dateService.getCurrentDate());
             storePureRepository.save(r);
+        });
+	}
+
+	public void updateCsOneService(CsGetDto dto) {
+        // System.out.println(dto);
+        csPureRepository.findById(dto.getCsId()).ifPresent(r->{
+            r.setCsType(dto.getCsType());
+            r.setCsTitle(dto.getCsTitle());
+            r.setCsDesc(dto.getCsDesc());
+            r.setCsAuthor(dto.getCsAuthor());
+            r.setCsImportantChecked(dto.isCsImportantChecked());
+            r.setCsViewCount(dto.getCsViewCount());
+            r.setCsUpdated(dateService.getCurrentDate());
+            csPureRepository.save(r);
         });
 	}
 }

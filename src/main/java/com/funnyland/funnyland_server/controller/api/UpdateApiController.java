@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.funnyland.funnyland_server.model.banner.dto.BannerGetDto;
 import com.funnyland.funnyland_server.model.counseling.dto.CounselingGetDto;
+import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
 import com.funnyland.funnyland_server.model.message.Message;
 import com.funnyland.funnyland_server.model.message.StatusEnum;
 import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
@@ -171,6 +172,32 @@ public class UpdateApiController {
         }
         try{
             updateService.updateStoreOneService(dto);
+        }catch(Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/update/cs/one
+    @PostMapping("/cs/one")
+    public ResponseEntity<Message> UpdateCsOneRequestApi(HttpServletRequest request, @RequestBody CsGetDto dto){
+        Message message = new Message();
+        HttpHeaders headers= new HttpHeaders();
+
+        try{
+            UserInfoVO user = userService.getUserInfo(request);
+            if(!user.getRole().equals("ROLE_ADMIN")){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }catch(NullPointerException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        try{
+            updateService.updateCsOneService(dto);
         }catch(Exception e){
             System.out.println(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

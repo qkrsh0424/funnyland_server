@@ -10,6 +10,7 @@ import com.funnyland.funnyland_server.model.banner.dto.BannerGetDto;
 import com.funnyland.funnyland_server.model.banner.dto.BannerResDto;
 import com.funnyland.funnyland_server.model.counseling.dto.CounselingGetDto;
 import com.funnyland.funnyland_server.model.counseling.dto.CounselingResDto;
+import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
 import com.funnyland.funnyland_server.model.message.Message;
 import com.funnyland.funnyland_server.model.message.StatusEnum;
 import com.funnyland.funnyland_server.model.page.PageDto;
@@ -288,6 +289,82 @@ public class SearchApiController {
 
         try{
             resData = searchService.searchStoreOneService(storeId);
+        }catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        // System.out.println(itemSize);
+
+        headers.setContentType(new MediaType("application","json",Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        message.setData(resData);
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/search/cs/all
+    @GetMapping("/cs/all")
+    public ResponseEntity<Message> SearchCsAllApi(
+        HttpServletRequest request,
+        @RequestParam(value = "csType", required = false, defaultValue = "") String csType,
+        @RequestParam(value = "pageIndex", required = false) String pageIndexStr
+    ){
+        HttpHeaders headers = new HttpHeaders();
+        Message message = new Message();
+
+        List<CsGetDto> resData = new ArrayList<>();
+
+        int displaySize = 30;
+        int itemSize = 0;
+        int pageIndex = 0;
+
+        try{
+            pageIndex = Integer.parseInt(pageIndexStr);
+        }catch(NumberFormatException e){
+            // System.out.println(e);
+        }
+        try{
+            resData = searchService.searchCsAllService(csType, pageIndex, displaySize);
+            itemSize = searchService.searchCountForCsExistService(csType);
+        }catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        PageDto page = new PageDto();
+        page.setItemSize(itemSize);
+        page.setDisplaySize(displaySize);
+        page.setPageSize((int) Math.ceil((double) itemSize / (double) displaySize));
+        page.setCurr(pageIndex+1);
+        page.setPrev(pageIndex==0 ? 1 : pageIndex);
+        page.setNext(pageIndex+1 >= page.getPageSize()?page.getPageSize():page.getCurr()+1);
+
+        headers.setContentType(new MediaType("application","json",Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        message.setData(resData);
+        message.setPage(page);
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/search/cs/one
+    @GetMapping("/cs/one")
+    public ResponseEntity<Message> SearchCsOneApi(HttpServletRequest request, @RequestParam(value = "csId", required = false) String csIdStr){
+        HttpHeaders headers = new HttpHeaders();
+        Message message = new Message();
+        CsGetDto resData = new CsGetDto();
+        
+        int csId = 0;
+
+        try{
+            csId = Integer.parseInt(csIdStr);
+        }catch(NumberFormatException e){
+            headers.setContentType(new MediaType("application","json",Charset.forName("UTF-8")));
+            message.setStatus(StatusEnum.OK);
+            message.setMessage("no_data");
+            return new ResponseEntity<>(message,headers,HttpStatus.OK);
+        }
+
+        try{
+            resData = searchService.searchCsOneService(csId);
         }catch(Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -8,6 +8,7 @@ import javax.swing.filechooser.FileSystemView;
 
 import com.funnyland.funnyland_server.model.banner.dto.BannerReqDto;
 import com.funnyland.funnyland_server.model.counseling.dto.CounselingReqDto;
+import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
 import com.funnyland.funnyland_server.model.message.Message;
 import com.funnyland.funnyland_server.model.message.StatusEnum;
 import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
@@ -179,6 +180,33 @@ public class InsertApiController {
         }
         try{
             insertService.insertStoreOneService(dto);
+        }catch(Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
+    // /api/insert/cs/one
+    @PostMapping("/cs/one")
+    public ResponseEntity<Message> InsertCsOneRequestApi(HttpServletRequest request, @RequestBody CsGetDto dto){
+        // System.out.println(dto);
+        Message message = new Message();
+        HttpHeaders headers= new HttpHeaders();
+
+        try{
+            UserInfoVO user = userService.getUserInfo(request);
+            if(!user.getRole().equals("ROLE_ADMIN")){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }catch(NullPointerException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        try{
+            insertService.insertCsOneService(dto);
         }catch(Exception e){
             System.out.println(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
