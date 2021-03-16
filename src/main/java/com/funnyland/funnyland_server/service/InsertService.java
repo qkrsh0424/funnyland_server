@@ -23,6 +23,9 @@ import com.funnyland.funnyland_server.model.counseling.repository.CounselingPure
 import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
 import com.funnyland.funnyland_server.model.cs.entity.CsPureEntity;
 import com.funnyland.funnyland_server.model.cs.repository.CsPureRepository;
+import com.funnyland.funnyland_server.model.popup.dto.PopupGetDto;
+import com.funnyland.funnyland_server.model.popup.entity.PopupPureEntity;
+import com.funnyland.funnyland_server.model.popup.repository.PopupPureRepository;
 import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
 import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product_category.entity.ProductCategoryPureEntity;
@@ -76,6 +79,9 @@ public class InsertService {
 
     @Autowired
     CsPureRepository csPureRepository;
+
+    @Autowired
+    PopupPureRepository popupPureRepository;
 
     public void insertCounselingOneService(CounselingReqDto dto) {
         counselingPureRepository.save(getCounselingEntityByDto(dto));
@@ -223,6 +229,22 @@ public class InsertService {
         entity.setCsImportantChecked(dto.isCsImportantChecked());
         entity.setCsCreated(dateService.getCurrentDate());
         entity.setCsUpdated(dateService.getCurrentDate());
+        return entity;
+    }
+
+    public void insertPopupOneService(PopupGetDto dto) {
+        PopupPureEntity entity = getPopupEntityByDto(dto);
+        popupPureRepository.save(entity);
+
+    }
+
+    private PopupPureEntity getPopupEntityByDto(PopupGetDto dto){
+        PopupPureEntity entity = new PopupPureEntity();
+        entity.setPopupName(dto.getPopupName());
+        entity.setPopupImageUrl(dto.getPopupImageUrl());
+        entity.setPopupUrl(dto.getPopupUrl());
+        entity.setPopupUpdated(dateService.getCurrentDate());
+        entity.setPopupCreated(dateService.getCurrentDate());
         return entity;
     }
 }

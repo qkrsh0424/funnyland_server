@@ -11,6 +11,7 @@ import com.funnyland.funnyland_server.model.counseling.dto.CounselingReqDto;
 import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
 import com.funnyland.funnyland_server.model.message.Message;
 import com.funnyland.funnyland_server.model.message.StatusEnum;
+import com.funnyland.funnyland_server.model.popup.dto.PopupGetDto;
 import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
 import com.funnyland.funnyland_server.model.store.dto.StoreGetDto;
 import com.funnyland.funnyland_server.model.store_area.dto.StoreAreaGetDto;
@@ -216,4 +217,32 @@ public class InsertApiController {
         message.setMessage("success");
         return new ResponseEntity<>(message,headers,HttpStatus.OK);
     }
+
+    // /api/insert/popup/one
+    @PostMapping("/popup/one")
+    public ResponseEntity<Message> InsertPopupOneRequestApi(HttpServletRequest request, @RequestBody PopupGetDto dto){
+        // System.out.println(dto);
+        Message message = new Message();
+        HttpHeaders headers= new HttpHeaders();
+
+        try{
+            UserInfoVO user = userService.getUserInfo(request);
+            if(!user.getRole().equals("ROLE_ADMIN")){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }catch(NullPointerException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        try{
+            insertService.insertPopupOneService(dto);
+        }catch(Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+    }
+
 }

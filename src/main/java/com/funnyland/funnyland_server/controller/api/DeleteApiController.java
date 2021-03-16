@@ -10,6 +10,7 @@ import com.funnyland.funnyland_server.model.counseling.dto.CounselingGetDto;
 import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
 import com.funnyland.funnyland_server.model.message.Message;
 import com.funnyland.funnyland_server.model.message.StatusEnum;
+import com.funnyland.funnyland_server.model.popup.dto.PopupGetDto;
 import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
 import com.funnyland.funnyland_server.model.store.dto.StoreGetDto;
@@ -247,6 +248,36 @@ public class DeleteApiController {
 
         try{
             deleteService.deleteCsOneService(dto);
+        }catch(Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("success");
+        return new ResponseEntity<>(message,headers,HttpStatus.OK);
+        
+    }
+
+    // /api/delete/popup/one
+    @PostMapping("/popup/one")
+    public ResponseEntity<Message> DeletePopupOneApiCompletely(HttpServletRequest request ,@RequestBody PopupGetDto dto){
+        Message message = new Message();
+        HttpHeaders headers= new HttpHeaders();
+        try{
+            UserInfoVO user = userService.getUserInfo(request);
+            // user.setRole("ROLE_USER");
+            if(!user.getRole().equals("ROLE_ADMIN")){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }catch(NullPointerException e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        try{
+            deleteService.deletePopupOneService(dto);
         }catch(Exception e){
             System.out.println(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

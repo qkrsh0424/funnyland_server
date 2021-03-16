@@ -47,8 +47,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
             .and()
             .formLogin()
             .loginPage("/login")
-            // .and()
-            // .cors()
+            .and()
+            .cors()
             .and()
             .csrf().csrfTokenRepository(getCookieCsrfTokenRepository());
             // .csrf()
@@ -105,17 +105,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     //     };
     // }
     
-    // @Bean
-    // public CorsConfigurationSource corsConfigurationSource() {
-    //     CorsConfiguration configuration = new CorsConfiguration();
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
 
-    //     configuration.addAllowedOrigin("http://localhost:3000");
-    //     configuration.addAllowedHeader("*");
-    //     configuration.addAllowedMethod("*");
-    //     configuration.setAllowCredentials(true);
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
 
-    //     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    //     source.registerCorsConfiguration("/**", configuration);
-    //     return source;
-    // }
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

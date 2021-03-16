@@ -13,6 +13,9 @@ import com.funnyland.funnyland_server.model.counseling.repository.CounselingPure
 import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
 import com.funnyland.funnyland_server.model.cs.entity.CsPureEntity;
 import com.funnyland.funnyland_server.model.cs.repository.CsPureRepository;
+import com.funnyland.funnyland_server.model.popup.dto.PopupGetDto;
+import com.funnyland.funnyland_server.model.popup.entity.PopupPureEntity;
+import com.funnyland.funnyland_server.model.popup.repository.PopupPureRepository;
 import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product.dto.ProductJCategoryGetDto;
 import com.funnyland.funnyland_server.model.product.projection.ProductJProductCategoryProj;
@@ -64,6 +67,9 @@ public class SearchService {
 
     @Autowired
     CsPureRepository csPureRepository;
+
+    @Autowired
+    PopupPureRepository popupPureRepository;
 
     public List<BannerGetDto> searchBannerAllByorderService() {
         List<BannerPureEntity> entities = bannerPureRepository.selectBannerAllByorder();
@@ -403,5 +409,26 @@ public class SearchService {
         dto.setCsCreated(entity.getCsCreated());
         dto.setCsUpdated(entity.getCsUpdated());
         return dto;
+    }
+
+    public List<PopupGetDto> searchPopupAllService() {
+        List<PopupPureEntity> entities = popupPureRepository.findAll();
+
+        return getPopupDtosByEntities(entities);
+    }
+
+    private List<PopupGetDto> getPopupDtosByEntities(List<PopupPureEntity> entities){
+        List<PopupGetDto> dtos = new ArrayList<>();
+        for(PopupPureEntity entity : entities){
+            PopupGetDto dto = new PopupGetDto();
+            dto.setPopupId(entity.getPopupId());
+            dto.setPopupName(entity.getPopupName());
+            dto.setPopupImageUrl(entity.getPopupImageUrl());
+            dto.setPopupUrl(entity.getPopupUrl());
+            dto.setPopupUpdated(entity.getPopupUpdated());
+            dto.setPopupCreated(entity.getPopupCreated());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }

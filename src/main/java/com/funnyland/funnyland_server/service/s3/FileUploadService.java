@@ -1,11 +1,14 @@
 package com.funnyland.funnyland_server.service.s3;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -35,6 +38,9 @@ public class FileUploadService {
 
     @Value("${cloud.aws.region.static}")
     private String region;
+
+    @Value("${app.external.address}")
+    private String address;
     
     @PostConstruct
     public void setS3Client() {
@@ -73,5 +79,28 @@ public class FileUploadService {
         
         // return String.valueOf(file.length);
         return fileUrl.get(0);
+    }
+
+    public String uploadToLocal(HttpServletRequest request, HttpServletResponse response, MultipartFile file) {
+        StringBuilder url = new StringBuilder();
+
+        String fileAddress = address;
+        String bucketPath = "/uploads/image/";
+        
+        String originalfileName = file.getOriginalFilename();
+        String fileName = String.valueOf(new Date().getTime())+"-"+((int)(Math.random()*99999)+10000)+originalfileName;  // 최종 파일 네임 : {현재 시간}-{랜덤값}{파일명}.{확장자명} 
+
+        url.append(fileAddress);
+        url.append(bucketPath);
+        url.append(fileName);
+
+        try{
+            String resourceSrc = request.getServletContext().getRealPath("/uploads/image");
+            File dest = new File(resourceSrc+"/"+fileName);
+            file.transferTo(dest);
+        }catch(IOException e){
+            return null;
+        }
+        return url.toString();
     }
 }

@@ -6,6 +6,8 @@ import com.funnyland.funnyland_server.model.counseling.dto.CounselingGetDto;
 import com.funnyland.funnyland_server.model.counseling.repository.CounselingPureRepository;
 import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
 import com.funnyland.funnyland_server.model.cs.repository.CsPureRepository;
+import com.funnyland.funnyland_server.model.popup.dto.PopupGetDto;
+import com.funnyland.funnyland_server.model.popup.repository.PopupPureRepository;
 import com.funnyland.funnyland_server.model.product.dto.ProductGetDto;
 import com.funnyland.funnyland_server.model.product.repository.ProductPureRepository;
 import com.funnyland.funnyland_server.model.product_category.dto.ProductCategoryGetDto;
@@ -50,6 +52,9 @@ public class DeleteService {
     @Autowired
     CsPureRepository csPureRepository;
 
+    @Autowired
+    PopupPureRepository popupPureRepository;
+
     public void deleteBannerOneService(BannerGetDto dto){
         bannerPureRepository.findById(dto.getId()).ifPresent(r->{
             r.setBannerDeleted(EXIST_OR_NOT.IS_DELETED);
@@ -92,4 +97,7 @@ public class DeleteService {
 	public void deleteCsOneService(CsGetDto dto) {
         csPureRepository.deleteById((dto.getCsId()));
 	}
+    public void deletePopupOneService(PopupGetDto dto) {
+        popupPureRepository.deleteById(dto.getPopupId());
+    }
 }
