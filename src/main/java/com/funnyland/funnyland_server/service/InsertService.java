@@ -243,6 +243,7 @@ public class InsertService {
         entity.setPopupName(dto.getPopupName());
         entity.setPopupImageUrl(dto.getPopupImageUrl());
         entity.setPopupUrl(dto.getPopupUrl());
+        entity.setPopupType(dto.getPopupType());
         entity.setPopupUpdated(dateService.getCurrentDate());
         entity.setPopupCreated(dateService.getCurrentDate());
         return entity;

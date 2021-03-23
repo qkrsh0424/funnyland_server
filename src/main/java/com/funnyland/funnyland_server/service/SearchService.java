@@ -425,6 +425,7 @@ public class SearchService {
             dto.setPopupName(entity.getPopupName());
             dto.setPopupImageUrl(entity.getPopupImageUrl());
             dto.setPopupUrl(entity.getPopupUrl());
+            dto.setPopupType(entity.getPopupType());
             dto.setPopupUpdated(entity.getPopupUpdated());
             dto.setPopupCreated(entity.getPopupCreated());
             dtos.add(dto);

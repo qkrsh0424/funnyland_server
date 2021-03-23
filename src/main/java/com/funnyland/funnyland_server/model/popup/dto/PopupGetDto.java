@@ -10,6 +10,7 @@ public class PopupGetDto {
     private String popupName;
     private String popupImageUrl;
     private String popupUrl;
+    private String popupType;
     private Date popupCreated;
     private Date popupUpdated;
 }
