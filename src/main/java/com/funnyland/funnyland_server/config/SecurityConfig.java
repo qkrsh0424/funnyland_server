@@ -11,7 +11,9 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -26,6 +28,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
+@EnableWebSecurity
 @EnableRedisHttpSession(maxInactiveIntervalInSeconds = 60*60)
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
     @Value("${spring.redis.host}")
@@ -33,7 +36,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Value("${spring.redis.port}")
     private int redisPort;
+
+    // @Value("${spring.redis.password}")
+    // private String redisPassword;
     
+    // ex) funnyland.co.kr
+    @Value("${app.server.domain}")
+    private String serverDomain;
+
+    // ex) http://funnyland.co.kr
+    @Value("${app.server.fulldomain}")
+    private String serverFullDomain;
+
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -58,6 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(redisAddress,redisPort);
+        // lettuceConnectionFactory.setPassword(redisPassword);
         return lettuceConnectionFactory;
     }
 
@@ -79,7 +94,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
         serializer.setCookieName("STUSEID");
         serializer.setCookiePath("/");
-        serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$");
+        serializer.setDomainName(serverDomain);
+        // serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$");
         return serializer;
     }
 
@@ -88,7 +104,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         CrossDomainCookieCsrfTokenRepository cookieTokenConfig = new CrossDomainCookieCsrfTokenRepository();
         cookieTokenConfig.setCookieName("XSTO");
         cookieTokenConfig.setCookiePath("/");
-        cookieTokenConfig.setDomainPattern("^.+?\\.(\\w+\\.[a-z]+)$");
+        cookieTokenConfig.setDomain(serverDomain);
+        // cookieTokenConfig.setDomainPattern("^.+?\\.(\\w+\\.[a-z]+)$");
         return cookieTokenConfig;
     }
 
@@ -108,8 +125,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        configuration.addAllowedOrigin("http://localhost:3000");
+        
+        configuration.addAllowedOrigin(serverFullDomain);
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
