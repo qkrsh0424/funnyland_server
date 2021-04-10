@@ -1,0 +1,14 @@
+# In application.properties
+서버 도메인, 세션 쿠키와 CORS 를 설정할때 사용. 부분
+app.server.domain=funnyland.co.kr
+app.server.fulldomain=http://funnyland.co.kr
+
+# In SecurityConfig.java
+redis setting 환경설정, 배포시 레디스 패스워드 설정.
+csrf 쿠키와 session 쿠키 생성 관련 설정, setDomain 체크해주기.
+
+# 이미지 업로드 관련 로컬을 선택할지 S3를 선택할지 체크.
+로컬 업로드시 
+app.external.assets.path=/**PATH**/
+app.external.address=/**FULL DOMAIN**/
+프론트엔드에서 upload to local 관련 세팅 체크, 업로드 api 체크, ckeditor setting 체크.

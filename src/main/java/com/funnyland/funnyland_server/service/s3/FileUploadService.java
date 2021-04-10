@@ -39,6 +39,9 @@ public class FileUploadService {
     @Value("${cloud.aws.region.static}")
     private String region;
 
+    @Value("${app.external.assets.path}")
+    private String assetsPath;
+
     @Value("${app.external.address}")
     private String address;
     
@@ -95,10 +98,13 @@ public class FileUploadService {
         url.append(fileName);
 
         try{
-            String resourceSrc = request.getServletContext().getRealPath("/uploads/image");
+            // String resourceSrc = request.getServletContext().getRealPath("/uploads/image");
+            String resourceSrc = assetsPath + "image";
+            System.out.println(resourceSrc);
             File dest = new File(resourceSrc+"/"+fileName);
             file.transferTo(dest);
         }catch(IOException e){
+            System.out.println(e);
             return null;
         }
         return url.toString();

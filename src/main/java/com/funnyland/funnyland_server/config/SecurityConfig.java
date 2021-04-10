@@ -94,7 +94,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
         serializer.setCookieName("STUSEID");
         serializer.setCookiePath("/");
-        serializer.setDomainName(serverDomain);
+        // serializer.setDomainName(serverDomain);
         // serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$");
         return serializer;
     }
@@ -104,7 +104,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         CrossDomainCookieCsrfTokenRepository cookieTokenConfig = new CrossDomainCookieCsrfTokenRepository();
         cookieTokenConfig.setCookieName("XSTO");
         cookieTokenConfig.setCookiePath("/");
-        cookieTokenConfig.setDomain(serverDomain);
+        // cookieTokenConfig.setDomain(serverDomain);
         // cookieTokenConfig.setDomainPattern("^.+?\\.(\\w+\\.[a-z]+)$");
         return cookieTokenConfig;
     }
