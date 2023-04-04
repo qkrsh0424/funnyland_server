@@ -1,55 +1,58 @@
 package com.funnyland.funnyland_server.service.user;
 
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.amazonaws.services.codecommit.model.UserInfo;
+import com.funnyland.funnyland_server.exception.dto.InvalidUserException;
 import com.funnyland.funnyland_server.model.user.dto.UserLoginSessionDTO;
+import com.funnyland.funnyland_server.model.user.entity.UserEntity;
+import com.funnyland.funnyland_server.model.user.repository.UserRepository;
 import com.funnyland.funnyland_server.model.user.vo.UserInfoVO;
 import com.funnyland.funnyland_server.service.handler.ConvertService;
-
+import com.funnyland.funnyland_server.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 @Service
 public class UserService {
     @Autowired
-    RedisTemplate redisTemplate;
-
-    @Autowired
-    UserAuthService userAuthService;
+    UserRepository userRepository;
 
     @Autowired
     ConvertService convert;
 
-    public UserInfoVO getUserInfo(HttpServletRequest request){
-        // **TODO**
-        // **Origin
-        // if(userAuthService.isUserSessionValid(request)){
-        //     UserLoginSessionDTO userLoginSessionDTO = (UserLoginSessionDTO) redisTemplate.opsForValue().get("spring:session:sessions:expires:" + request.getSession().getId());
-        //     return getUserSessionDtoToVo(userLoginSessionDTO);
-        // }
-        // return null;
-        // **TEST OK**
-        if(userAuthService.isUserSessionValid(request)){
-            // System.out.println("UserService/getUserInfo : hello");
-            UserLoginSessionDTO userLoginSessionDTO = (UserLoginSessionDTO) convert.jsonString2ObjectClassConvert((String)redisTemplate.opsForValue().get("spring:session:sessions:expires:" + request.getSession().getId()), UserLoginSessionDTO.class);
-            return getUserSessionDtoToVo(userLoginSessionDTO);
-        }
-        return null;
+    public UserInfoVO getUserInfo(HttpServletRequest request) {
+        String userId = UserUtils.getUserIdElseThrow();
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new InvalidUserException("로그인이 필요한 서비스 입니다."));
+
+        UserInfoVO vo = UserInfoVO.builder()
+                .username(userEntity.getUsername())
+                .email(userEntity.getEmail())
+                .userUrl(userEntity.getUserUrl())
+                .name(userEntity.getName())
+                .role(userEntity.getRoles())
+                .createdAt(userEntity.getCreatedAt())
+                .updatedAt(userEntity.getUpdatedAt())
+                .credentialCreatedAt(userEntity.getCredentialCreatedAt())
+                .credentialExpireAt(userEntity.getCredentialExpireAt())
+                .build();
+        return vo;
     }
 
-    public UserInfoVO getUserSessionDtoToVo(UserLoginSessionDTO userSessionData){
-        UserInfoVO user = new UserInfoVO();
-        user.setUsername(userSessionData.getUsername());
-        user.setEmail(userSessionData.getEmail());
-        user.setUserUrl(userSessionData.getUserUrl());
-        user.setName(userSessionData.getName());
-        user.setRole(userSessionData.getRole());
-        user.setCreatedAt(userSessionData.getCreatedAt());
-        user.setUpdatedAt(userSessionData.getUpdatedAt());
-        user.setCredentialCreatedAt(userSessionData.getCredentialCreatedAt());
-        user.setCredentialExpireAt(userSessionData.getCredentialExpireAt());
+    public UserInfoVO getUserSessionDtoToVo(UserLoginSessionDTO userSessionData) {
+        UserInfoVO user = UserInfoVO.builder()
+                .username(userSessionData.getUsername())
+                .email(userSessionData.getEmail())
+                .userUrl(userSessionData.getUserUrl())
+                .name(userSessionData.getName())
+                .role(userSessionData.getRole())
+                .createdAt(userSessionData.getCreatedAt())
+                .updatedAt(userSessionData.getUpdatedAt())
+                .credentialCreatedAt(userSessionData.getCredentialCreatedAt())
+                .credentialExpireAt(userSessionData.getCredentialExpireAt())
+                .build();
         return user;
     }
 }

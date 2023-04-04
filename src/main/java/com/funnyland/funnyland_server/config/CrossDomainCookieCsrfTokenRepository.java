@@ -1,23 +1,21 @@
 package com.funnyland.funnyland_server.config;
 
-import java.lang.reflect.Method;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.DefaultCsrfToken;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
-public class CrossDomainCookieCsrfTokenRepository implements CsrfTokenRepository {
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+//public class CrossDomainCookieCsrfTokenRepository implements CsrfTokenRepository {
+public class CrossDomainCookieCsrfTokenRepository{
 
 	static final String DEFAULT_CSRF_COOKIE_NAME = "XSRF-TOKEN";
 

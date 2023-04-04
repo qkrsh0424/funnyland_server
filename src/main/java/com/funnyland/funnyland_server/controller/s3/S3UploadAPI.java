@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.funnyland.funnyland_server.annotation.RequiredLogin;
 import com.funnyland.funnyland_server.service.s3.FileUploadService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class S3UploadAPI {
 
     // /api/fileupload/image
     @PostMapping("/image")
+    @RequiredLogin
     public String FileUpload(HttpServletRequest request, HttpServletResponse response,
             @RequestParam("file") MultipartFile[] files) throws IOException {
         String url = fileUploadService.upload(files);
@@ -39,6 +41,7 @@ public class S3UploadAPI {
 
     // /api/fileupload/external/image
     @PostMapping("/external/image")
+    @RequiredLogin
     public String FileUploadExternalImage(HttpServletRequest request, HttpServletResponse response,
             @RequestParam("file") MultipartFile file) {
         String url = fileUploadService.uploadToLocal(request, response, file);

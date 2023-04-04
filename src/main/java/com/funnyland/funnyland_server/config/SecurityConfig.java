@@ -1,139 +1,80 @@
 package com.funnyland.funnyland_server.config;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Value;
+import com.funnyland.funnyland_server.config.auth.JwtAuthorizationFilter;
+import com.funnyland.funnyland_server.config.csrf.CsrfAuthenticationFilter;
+import com.funnyland.funnyland_server.config.csrf.CsrfExceptionFilter;
+import com.funnyland.funnyland_server.config.referer.RefererAuthenticationFilter;
+import com.funnyland.funnyland_server.config.referer.RefererExceptionFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
-import org.springframework.security.web.savedrequest.SimpleSavedRequest;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-import org.springframework.session.web.http.CookieSerializer;
-import org.springframework.session.web.http.DefaultCookieSerializer;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.web.firewall.HttpFirewall;
 
 @Configuration
 @EnableWebSecurity
-@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 60*60)
-public class SecurityConfig extends WebSecurityConfigurerAdapter{
-    @Value("${spring.redis.host}")
-    private String redisAddress;
+@RequiredArgsConstructor
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .httpBasic().disable()
+                .csrf().disable()
+                .formLogin().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);    // 토큰을 활용하면 세션이 필요없으므로 STATELESS로 설정해 세션을 사용하지 않는다
 
-    @Value("${spring.redis.port}")
-    private int redisPort;
-
-    // @Value("${spring.redis.password}")
-    // private String redisPassword;
-    
-    // ex) funnyland.co.kr
-    @Value("${app.server.domain}")
-    private String serverDomain;
-
-    // ex) http://funnyland.co.kr
-    @Value("${app.server.fulldomain}")
-    private String serverFullDomain;
+        http.cors();
+//        http
+//                .authorizeRequests()
+//                .antMatchers("/api/v1/superadmin/**")
+//                .access("hasRole('ROLE_SUPERADMIN')")
+//                .antMatchers("/api/v1/admin/**")
+//                .access("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+//                .antMatchers("/api/v1/manager/**")
+//                .access("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+//                .antMatchers("/api/v1/membership/**")
+//                .access("hasRole('ROLE_MEMBERSHIP') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+//                .antMatchers("/api/v1/member/**")
+//                .access("hasRole('ROLE_MEMBER') or hasRole('ROLE_MEMBERSHIP') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERADMIN')")
+//                .antMatchers("/api/v1/any/**")
+//                .permitAll()
+//                .anyRequest().permitAll();
+        http
+                .authorizeRequests()
+                .anyRequest().permitAll()
+        ;
+        http
+                .addFilterBefore(new RefererAuthenticationFilter(), CsrfFilter.class)
+                .addFilterAfter(new CsrfAuthenticationFilter(), RefererAuthenticationFilter.class)
+                .addFilterAfter(new JwtAuthorizationFilter(), CsrfAuthenticationFilter.class)
+                .addFilterBefore(new RefererExceptionFilter(), RefererAuthenticationFilter.class)
+                .addFilterBefore(new CsrfExceptionFilter(), CsrfAuthenticationFilter.class)
+//                .addFilterBefore(new JwtAuthorizationExceptionFilter(), JwtAuthorizationFilter.class)
+        ;
+    }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
-    @Override
-    protected void configure(HttpSecurity http) throws Exception{
-        http
-            .authorizeRequests()
-            .anyRequest().permitAll()
-            .and()
-            .formLogin()
-            .loginPage("/login")
-            .and()
-            .cors()
-            .and()
-            .csrf().csrfTokenRepository(getCookieCsrfTokenRepository());
-            // .csrf()
-            //     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+
+    // h2 setting 시에는 시큐리티를 무시한다.
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/h2-console/**");
+        web.httpFirewall(defaultHttpFirewall());
     }
 
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(redisAddress,redisPort);
-        // lettuceConnectionFactory.setPassword(redisPassword);
-        return lettuceConnectionFactory;
-    }
-
-    @Bean
-    public RedisTemplate<String, String> redisTemplate() {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
-        
-        return redisTemplate;
-    }
-
-    @Bean
-    public CookieSerializer cookieSerializer(){
-        DefaultCookieSerializer serializer = new DefaultCookieSerializer();
-        serializer.setCookieName("STUSEID");
-        serializer.setCookiePath("/");
-        // serializer.setDomainName(serverDomain);
-        // serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$");
-        return serializer;
-    }
-
-    @Bean
-    public CrossDomainCookieCsrfTokenRepository getCookieCsrfTokenRepository(){
-        CrossDomainCookieCsrfTokenRepository cookieTokenConfig = new CrossDomainCookieCsrfTokenRepository();
-        cookieTokenConfig.setCookieName("XSTO");
-        cookieTokenConfig.setCookiePath("/");
-        // cookieTokenConfig.setDomain(serverDomain);
-        // cookieTokenConfig.setDomainPattern("^.+?\\.(\\w+\\.[a-z]+)$");
-        return cookieTokenConfig;
-    }
-
-    // @Bean
-    // public RequestCache refererRequestCache() {
-    //     return new HttpSessionRequestCache() {
-    //         @Override
-    //         public void saveRequest(HttpServletRequest request, HttpServletResponse response) {
-    //             String referrer = request.getHeader("referer");
-    //             if (referrer != null) {
-    //                 request.getSession().setAttribute("SPRING_SECURITY_SAVED_REQUEST", new SimpleSavedRequest(referrer));
-    //             }
-    //         }
-    //     };
-    // }
-    
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        
-        configuration.addAllowedOrigin(serverFullDomain);
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
-        configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // source.registerCorsConfiguration("/**", configuration);
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+    public HttpFirewall defaultHttpFirewall() {
+        return new DefaultHttpFirewall();
     }
 }

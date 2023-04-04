@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.filechooser.FileSystemView;
 
+import com.funnyland.funnyland_server.annotation.RequiredLogin;
 import com.funnyland.funnyland_server.model.banner.dto.BannerReqDto;
 import com.funnyland.funnyland_server.model.counseling.dto.CounselingReqDto;
 import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
@@ -51,6 +52,7 @@ public class InsertApiController {
 
     // /api/insert/banner/multiple
     @PostMapping("/banner/multiple")
+    @RequiredLogin
     public String InsertBannerMultipleRequest(HttpServletRequest request, @RequestBody List<BannerReqDto> dtos){
         insertService.insertBannersService(dtos);
         return "{\"message\":\"success\"}";
@@ -58,6 +60,7 @@ public class InsertApiController {
 
     // /api/insert/product_category/one
     @PostMapping("/product_category/one")
+    @RequiredLogin
     public ResponseEntity<Message> InsertProductCategoryOneRequest(HttpServletRequest request, @RequestBody ProductCategoryGetDto dto){
         // System.out.println(dto);
         Message message = new Message();
@@ -85,6 +88,7 @@ public class InsertApiController {
 
     // /api/insert/product/one
     @PostMapping("/product/one")
+    @RequiredLogin
     public ResponseEntity<Message> InsertProductOneRequest(HttpServletRequest request, @RequestBody ProductGetDto dto){
         // System.out.println(dto);
         Message message = new Message();
@@ -112,6 +116,7 @@ public class InsertApiController {
 
     // /api/insert/video/one
     @PostMapping("/video/one")
+    @RequiredLogin
     public ResponseEntity<Message> InsertVideoOneRequestApi(HttpServletRequest request, @RequestBody VideoGetDto dto){
         // System.out.println(dto);
         Message message = new Message();
@@ -139,6 +144,7 @@ public class InsertApiController {
 
     // /api/insert/store_area/one
     @PostMapping("/store_area/one")
+    @RequiredLogin
     public ResponseEntity<Message> InsertStoreAreaOneRequestApi(HttpServletRequest request, @RequestBody StoreAreaGetDto dto){
         // System.out.println(dto);
         Message message = new Message();
@@ -166,6 +172,7 @@ public class InsertApiController {
 
     // /api/insert/store/one
     @PostMapping("/store/one")
+    @RequiredLogin
     public ResponseEntity<Message> InsertStoreOneRequestApi(HttpServletRequest request, @RequestBody StoreGetDto dto){
         // System.out.println(dto);
         Message message = new Message();
@@ -193,6 +200,7 @@ public class InsertApiController {
 
     // /api/insert/cs/one
     @PostMapping("/cs/one")
+    @RequiredLogin
     public ResponseEntity<Message> InsertCsOneRequestApi(HttpServletRequest request, @RequestBody CsGetDto dto){
         // System.out.println(dto);
         Message message = new Message();
@@ -220,6 +228,7 @@ public class InsertApiController {
 
     // /api/insert/popup/one
     @PostMapping("/popup/one")
+    @RequiredLogin
     public ResponseEntity<Message> InsertPopupOneRequestApi(HttpServletRequest request, @RequestBody PopupGetDto dto){
         // System.out.println(dto);
         Message message = new Message();

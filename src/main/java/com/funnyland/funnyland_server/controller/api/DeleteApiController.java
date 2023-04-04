@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.funnyland.funnyland_server.annotation.RequiredLogin;
 import com.funnyland.funnyland_server.model.banner.dto.BannerGetDto;
 import com.funnyland.funnyland_server.model.counseling.dto.CounselingGetDto;
 import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
@@ -53,6 +54,7 @@ public class DeleteApiController {
 
     // /api/delete/counseling/one
     @PostMapping("/counseling/one")
+    @RequiredLogin
     public ResponseEntity<Message> DeleteCounselingOneApi(HttpServletRequest request ,@RequestBody CounselingGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -83,6 +85,7 @@ public class DeleteApiController {
 
     // /api/delete/product_category/one
     @PostMapping("/product_category/one")
+    @RequiredLogin
     public ResponseEntity<Message> DeleteProductCategoryOneApi(HttpServletRequest request ,@RequestBody ProductCategoryGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -113,6 +116,7 @@ public class DeleteApiController {
 
     // /api/delete/product/one
     @PostMapping("/product/one")
+    @RequiredLogin
     public ResponseEntity<Message> DeleteProductOneApi(HttpServletRequest request ,@RequestBody ProductGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -143,6 +147,7 @@ public class DeleteApiController {
 
     // /api/delete/video/one
     @PostMapping("/video/one")
+    @RequiredLogin
     public ResponseEntity<Message> DeleteVideoOneApiCompletely(HttpServletRequest request ,@RequestBody VideoGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -173,6 +178,7 @@ public class DeleteApiController {
 
     // /api/delete/store_area/one
     @PostMapping("/store_area/one")
+    @RequiredLogin
     public ResponseEntity<Message> DeleteStoreAreaOneApi(HttpServletRequest request ,@RequestBody StoreAreaGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -203,6 +209,7 @@ public class DeleteApiController {
 
     // /api/delete/store/one
     @PostMapping("/store/one")
+    @RequiredLogin
     public ResponseEntity<Message> DeleteStoreOneApi(HttpServletRequest request ,@RequestBody StoreGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -232,6 +239,7 @@ public class DeleteApiController {
     }
 
     @PostMapping("/cs/one")
+    @RequiredLogin
     public ResponseEntity<Message> DeleteCsOneApi(HttpServletRequest request ,@RequestBody CsGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -262,6 +270,7 @@ public class DeleteApiController {
 
     // /api/delete/popup/one
     @PostMapping("/popup/one")
+    @RequiredLogin
     public ResponseEntity<Message> DeletePopupOneApiCompletely(HttpServletRequest request ,@RequestBody PopupGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();

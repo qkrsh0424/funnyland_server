@@ -1,6 +1,9 @@
 package com.funnyland.funnyland_server.model.user.entity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,14 +11,26 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Where;
 import org.springframework.lang.Nullable;
 
 import lombok.Data;
 
-@Entity
 @Data
+@Entity
 @Table(name = "user")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@DynamicInsert
+@DynamicUpdate
 public class UserEntity {
     @Id
     @Column(name = "id")
@@ -41,7 +56,7 @@ public class UserEntity {
     private String name;
 
     @Column(name = "role")
-    private String role;
+    private String roles;
 
     // @Column(name = "created_at", insertable = false, updatable = false)
     @Column(name = "created_at")
@@ -62,5 +77,12 @@ public class UserEntity {
 
     @Column(name = "deleted")
     private int deleted;
+
+    public List<String> getRoleList(){
+        if(this.roles.length() > 0){
+            return Arrays.asList(this.roles.replaceAll(" ","").split(","));
+        }
+        return new ArrayList<>();
+    }
 
 }

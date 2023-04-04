@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.funnyland.funnyland_server.annotation.RequiredLogin;
 import com.funnyland.funnyland_server.model.banner.dto.BannerGetDto;
 import com.funnyland.funnyland_server.model.counseling.dto.CounselingGetDto;
 import com.funnyland.funnyland_server.model.cs.dto.CsGetDto;
@@ -40,6 +41,7 @@ public class UpdateApiController {
 
     // /api/update/banner/all
     @PostMapping("/banner/all")
+    @RequiredLogin
     public String UpdateBannerAllApi(@RequestBody List<BannerGetDto> dtos){
         updateService.updateBannersAllService(dtos);
         return "{\"message\":\"success\"}";
@@ -47,6 +49,7 @@ public class UpdateApiController {
 
     // /api/update/counseling/one
     @PostMapping("/counseling/one")
+    @RequiredLogin
     public String UpdateCounselingOneApi(@RequestBody CounselingGetDto dto){
         updateService.updateCounselingOneService(dto);
         return "{\"message\":\"success\"}";
@@ -54,6 +57,7 @@ public class UpdateApiController {
 
     // /api/update/product/one
     @PostMapping("/product/one")
+    @RequiredLogin
     public ResponseEntity<Message> UpdateProductOneRequest(HttpServletRequest request, @RequestBody ProductGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -80,6 +84,7 @@ public class UpdateApiController {
 
     // /api/update/category/one
     @PostMapping("/category/one")
+    @RequiredLogin
     public ResponseEntity<Message> UpdateCategoryOneRequestApi(HttpServletRequest request, @RequestBody ProductCategoryGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -106,6 +111,7 @@ public class UpdateApiController {
 
     // /api/update/video/one/display
     @PostMapping("/video/one/display")
+    @RequiredLogin
     public ResponseEntity<Message> UpdateVideoOneDisplayRequestApi(HttpServletRequest request, @RequestBody VideoGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -132,6 +138,7 @@ public class UpdateApiController {
 
     // /api/update/store_area/one
     @PostMapping("/store_area/one")
+    @RequiredLogin
     public ResponseEntity<Message> UpdateStoreAreaOneRequestApi(HttpServletRequest request, @RequestBody StoreAreaGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -158,6 +165,7 @@ public class UpdateApiController {
 
     // /api/update/store/one
     @PostMapping("/store/one")
+    @RequiredLogin
     public ResponseEntity<Message> UpdateStoreOneRequestApi(HttpServletRequest request, @RequestBody StoreGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();
@@ -184,6 +192,7 @@ public class UpdateApiController {
 
     // /api/update/cs/one
     @PostMapping("/cs/one")
+    @RequiredLogin
     public ResponseEntity<Message> UpdateCsOneRequestApi(HttpServletRequest request, @RequestBody CsGetDto dto){
         Message message = new Message();
         HttpHeaders headers= new HttpHeaders();

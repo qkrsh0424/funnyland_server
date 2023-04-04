@@ -1,25 +1,32 @@
 package com.funnyland.funnyland_server.controller.api;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import com.funnyland.funnyland_server.model.csrf.service.CsrfTokenService;
+import com.funnyland.funnyland_server.model.message_v2.Message;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/api/token")
+@RequiredArgsConstructor
 public class TokenApiController {
-    @Autowired
-    CsrfTokenRepository csrfTokenRepository;
-    @GetMapping("/get/csrf")
-    public void GetCsrfToken(HttpServletRequest request, HttpServletResponse response){
-        CsrfToken csrfToken = csrfTokenRepository.generateToken(request);
-        csrfTokenRepository.saveToken(csrfToken, request, response);
-        // System.out.println(csrfTokenRepository.loadToken(request).getToken());
+    private final CsrfTokenService csrfTokenService;
+
+    @GetMapping("/csrf")
+    public ResponseEntity<?> getCsrfToken(HttpServletRequest request, HttpServletResponse response){
+        Message message = new Message();
+
+        csrfTokenService.getCsrfToken(response);
+        message.setStatus(HttpStatus.OK);
+        message.setMessage("success");
+        message.setData("csrf");
+
+        return new ResponseEntity<>(message, message.getStatus());
     }
 }
