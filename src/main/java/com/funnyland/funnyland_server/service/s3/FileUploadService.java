@@ -39,12 +39,6 @@ public class FileUploadService {
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    @Value("${app.external.assets.path}")
-    private String assetsPath;
-
-    @Value("${app.external.address}")
-    private String address;
-    
     @PostConstruct
     public void setS3Client() {
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
@@ -82,31 +76,5 @@ public class FileUploadService {
         
         // return String.valueOf(file.length);
         return fileUrl.get(0);
-    }
-
-    public String uploadToLocal(HttpServletRequest request, HttpServletResponse response, MultipartFile file) {
-        StringBuilder url = new StringBuilder();
-
-        String fileAddress = address;
-        String bucketPath = "/uploads/image/";
-        
-        String originalfileName = file.getOriginalFilename();
-        String fileName = String.valueOf(new Date().getTime())+"-"+((int)(Math.random()*99999)+10000)+originalfileName;  // 최종 파일 네임 : {현재 시간}-{랜덤값}{파일명}.{확장자명} 
-
-        url.append(fileAddress);
-        url.append(bucketPath);
-        url.append(fileName);
-
-        try{
-            // String resourceSrc = request.getServletContext().getRealPath("/uploads/image");
-            String resourceSrc = assetsPath + "image";
-            System.out.println(resourceSrc);
-            File dest = new File(resourceSrc+"/"+fileName);
-            file.transferTo(dest);
-        }catch(IOException e){
-            System.out.println(e);
-            return null;
-        }
-        return url.toString();
     }
 }
