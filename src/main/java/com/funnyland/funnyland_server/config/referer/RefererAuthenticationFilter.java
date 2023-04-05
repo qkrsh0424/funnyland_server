@@ -21,8 +21,8 @@ public class RefererAuthenticationFilter extends OncePerRequestFilter {
     final static List<String> refererWhiteList = Arrays.asList(
             "http://localhost:3001",
             "http://localhost:3000",
-            "https://sellertl.com",
-            "https://www.sellertl.com"
+            "http://www.funnyland.co.kr",
+            "https://www.funnyland.co.kr"
     );
 
 
